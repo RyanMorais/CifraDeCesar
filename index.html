@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Cryptex OS: Decodificador</title>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="grid-bg"></div>
+
+    <div class="app">
+        <header>
+            <div class="brand">
+                <i class="ph-fill ph-aperture"></i>
+                <span>CIFRA DE CÉSAR</span>
+            </div>
+            <div class="actions">
+                <button onclick="toggleModal('help-modal')"><i class="ph ph-question"></i></button>
+                <button onclick="openAdmin()"><i class="ph ph-lock-key"></i></button>
+            </div>
+        </header>
+
+        <div class="hud">
+            <div class="hud-top">
+                <span class="level">NÍVEL <span id="level-num">1</span></span>
+                <span class="status blink">ONLINE</span>
+            </div>
+            <div class="hint-container">
+                <i class="ph ph-info"></i>
+                <p id="puzzle-hint">Iniciando sistema...</p>
+            </div>
+            <div class="code-display">
+                <span id="puzzle-code">...</span>
+            </div>
+        </div>
+
+        <div class="disk-stage">
+            <div class="pointer-arrow">▼</div>
+            
+            <div id="disk-wrapper" class="disk-wrapper">
+                <div id="outer-ring" class="ring outer">
+                    <div class="ring-decoration"></div>
+                </div>
+                
+                <div id="inner-ring" class="ring inner">
+                    <div class="center-knob">
+                        <i class="ph-fill ph-fingerprint"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-readout">
+                CHAVE (OFFSET): <span id="offset-val">0</span>
+            </div>
+        </div>
+
+        <div class="input-area">
+            <input type="text" id="answer-input" placeholder="DIGITE A SENHA..." autocomplete="off">
+            <button onclick="checkAnswer()"><i class="ph-bold ph-arrow-right"></i></button>
+        </div>
+        <div id="feedback" class="feedback"></div>
+    </div>
+
+    <div id="help-modal" class="modal hidden">
+        <div class="modal-box">
+            <div class="modal-head"><h3>TUTORIAL</h3><button onclick="toggleModal('help-modal')">X</button></div>
+            <div class="modal-body">
+                <p>1. <strong>Gire os anéis:</strong> Toque no centro para o anel interno e na borda para o externo.</p>
+                <p>2. <strong>Alinhe:</strong> Use a dica para descobrir a correspondência das letras.</p>
+                <p>3. <strong>Decifre:</strong> O anel interno é o código, o externo é a tradução.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="admin-modal" class="modal hidden">
+        <div class="modal-box admin-box">
+            <div class="modal-head"><h3>ADMINISTRAÇÃO</h3><button onclick="toggleModal('admin-modal')">X</button></div>
+            
+            <div id="adm-login-view">
+                <p style="text-align:center; color:#666; margin-bottom:10px;">Acesso Restrito</p>
+                <input type="password" id="adm-pass-input" placeholder="SENHA" style="text-align:center; letter-spacing:3px;">
+                <button class="btn-primary" onclick="verifyAdminLogin()">ACESSAR</button>
+                <p id="login-error" style="color:var(--error); text-align:center; margin-top:5px; font-size:0.8rem;"></p>
+            </div>
+
+            <div id="adm-dashboard-view" class="hidden">
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="switchTab('create')">CRIAR</button>
+                    <button class="tab-btn" onclick="switchTab('list')">LISTA (<span id="total-puzzles">0</span>)</button>
+                </div>
+
+                <div id="tab-create" class="tab-content">
+                    <label>Resposta Real</label>
+                    <input type="text" id="adm-ans" placeholder="Ex: FUTURO" oninput="this.value=this.value.toUpperCase()">
+                    <div style="display:flex; gap:10px;">
+                        <div style="flex:1"><label>Chave (1-25)</label><input type="number" id="adm-shift" value="3" min="1" max="25"></div>
+                        <div style="flex:1; padding-top:28px; font-size:0.8rem; color:#666;">Preview: <span id="adm-preview" style="color:var(--primary)">...</span></div>
+                    </div>
+                    <label>Dica</label>
+                    <input type="text" id="adm-hint" placeholder="Dica da missão">
+                    <button class="btn-primary" onclick="savePuzzle()">SALVAR ENIGMA</button>
+                </div>
+
+                <div id="tab-list" class="tab-content hidden">
+                    <div id="puzzle-list-container" class="puzzle-list"></div>
+                    <button class="btn-danger" onclick="clearStorage()">FORMATAR DADOS (RESET)</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="success-overlay" class="overlay hidden">
+        <div class="scan-line"></div>
+        <div class="msg-box">
+            <i class="ph-fill ph-check-circle"></i>
+            <h1>ACESSO CONCEDIDO</h1>
+            <p>Decriptografia completa.</p>
+            <button onclick="nextLevel()">PRÓXIMO NÍVEL</button>
+        </div>
+    </div>
+
+    <div id="error-overlay" class="glitch-layer hidden"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>

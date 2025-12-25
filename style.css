@@ -1,0 +1,187 @@
+:root {
+    --bg: #050505;
+    --primary: #00ffc8; /* Verde Neon */
+    --secondary: #0066ff; /* Azul Tech */
+    --error: #ff004c;
+    --surface: #0f1115;
+    --text: #e0e0e0;
+    --font-ui: 'Rajdhani', sans-serif;
+    --font-mono: 'Orbitron', monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; }
+
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-ui);
+    height: 100vh;
+    overflow: hidden;
+    display: flex; justify-content: center;
+}
+
+.grid-bg {
+    position: fixed; inset: 0;
+    background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 40px 40px; z-index: -1;
+}
+
+.app {
+    width: 100%; max-width: 480px; height: 100%;
+    display: flex; flex-direction: column; padding: 15px; position: relative; z-index: 10;
+}
+
+/* --- HEADER & HUD --- */
+header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding-bottom: 15px; border-bottom: 1px solid #222;
+}
+.brand { color: var(--primary); font-family: var(--font-mono); font-size: 1.2rem; display: flex; align-items: center; gap: 8px; }
+.actions button { background: none; border: 1px solid #333; color: #fff; width: 36px; height: 36px; border-radius: 8px; cursor: pointer; }
+
+.hud { margin-top: 15px; background: var(--surface); padding: 12px; border-radius: 8px; border-left: 3px solid var(--secondary); }
+.hud-top { display: flex; justify-content: space-between; font-weight: 700; color: #666; font-size: 0.9rem; }
+.blink { color: var(--primary); animation: pulse 1.5s infinite; }
+.hint-container { display: flex; gap: 10px; margin-top: 8px; align-items: center; color: #aaa; font-size: 0.95rem; }
+.code-display { text-align: center; margin-top: 10px; font-family: var(--font-mono); font-size: 1.5rem; letter-spacing: 3px; color: var(--secondary); word-break: break-all; }
+
+/* --- DISCO (Mecânica Principal) --- */
+.disk-stage {
+    flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    position: relative;
+}
+
+.disk-wrapper {
+    position: relative;
+    width: min(85vw, 340px); height: min(85vw, 340px);
+    display: flex; justify-content: center; align-items: center;
+}
+
+.pointer-arrow {
+    position: absolute; top: 0px; z-index: 10;
+    color: var(--error); font-size: 1.5rem; filter: drop-shadow(0 0 8px var(--error));
+}
+
+.ring {
+    position: absolute; border-radius: 50%;
+    display: flex; justify-content: center; align-items: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    cursor: grab; touch-action: none;
+    /* Variável atualizada pelo JS */
+    --rot: 0deg;
+    transform: rotate(var(--rot));
+}
+.ring:active { cursor: grabbing; }
+
+.outer {
+    width: 100%; height: 100%;
+    background: linear-gradient(145deg, #1a1a1a, #0d0d0d);
+    border: 1px solid #333; z-index: 1;
+}
+.inner {
+    width: 62%; height: 62%;
+    background: #000; border: 2px solid var(--primary); z-index: 2;
+    box-shadow: 0 0 25px rgba(0, 255, 200, 0.1);
+}
+
+.center-knob {
+    width: 40%; height: 40%; background: #111; border-radius: 50%;
+    display: flex; justify-content: center; align-items: center;
+    border: 1px solid #333; color: #333; font-size: 2rem; pointer-events: none;
+}
+
+/* LÓGICA DAS LETRAS (Ferris Wheel Effect) */
+.char {
+    position: absolute; top: 50%; left: 50%;
+    width: 30px; height: 30px; margin-left: -15px; margin-top: -15px;
+    text-align: center; line-height: 30px; font-weight: 700;
+    
+    --initial-angle: 0deg;
+    --radius: 0px;
+
+    /* A mágica: Gira para posição, empurra para raio, gira ao contrário */
+    transform: 
+        rotate(var(--initial-angle)) 
+        translate(var(--radius)) 
+        rotate(calc( (var(--initial-angle) + var(--rot)) * -1 ));
+}
+.outer .char { color: #666; font-size: 0.8rem; }
+.inner .char { color: var(--primary); font-size: 1rem; text-shadow: 0 0 5px var(--primary); }
+
+.info-readout { margin-top: 20px; font-family: var(--font-mono); color: #555; font-size: 0.8rem; }
+#offset-val { color: var(--primary); font-size: 1rem; }
+
+/* --- INPUT --- */
+.input-area { display: flex; width: 100%; height: 50px; border-radius: 8px; overflow: hidden; border: 1px solid #333; }
+#answer-input { flex: 1; background: #0a0a0a; border: none; color: white; padding: 0 15px; font-family: var(--font-mono); font-size: 1.1rem; text-transform: uppercase; }
+#answer-input:focus { outline: none; background: #111; }
+.input-area button { width: 60px; background: var(--primary); border: none; font-size: 1.2rem; cursor: pointer; }
+.feedback { height: 20px; margin-top: 5px; text-align: center; font-weight: bold; font-size: 0.9rem; }
+
+/* --- MODAIS & ADMIN --- */
+.modal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 100; display: flex; justify-content: center; align-items: center; padding: 20px; }
+.hidden { display: none !important; }
+
+.modal-box { 
+    background: var(--surface); border: 1px solid #333; 
+    width: 100%; max-width: 400px; padding: 20px; 
+    border-radius: 12px; box-shadow: 0 0 40px rgba(0, 255, 200, 0.05);
+}
+.modal-head { display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px; }
+.modal-head button { background: none; border: none; color: #666; font-size: 1.2rem; cursor: pointer; }
+
+/* Admin Tabs */
+.tabs { display: flex; margin-bottom: 15px; border-bottom: 1px solid #333; }
+.tab-btn { flex: 1; background: none; border: none; color: #666; padding: 10px; cursor: pointer; border-bottom: 2px solid transparent; transition: 0.3s; }
+.tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+
+.tab-content label { display: block; font-size: 0.75rem; color: #888; margin-bottom: 4px; margin-top: 10px; }
+.tab-content input { width: 100%; padding: 12px; background: #050505; border: 1px solid #333; color: white; border-radius: 4px; }
+.btn-primary { width: 100%; padding: 12px; background: var(--secondary); color: white; border: none; font-weight: bold; border-radius: 4px; margin-top: 15px; cursor: pointer; }
+.btn-danger { width: 100%; padding: 10px; background: #300; color: #f88; border: none; border-radius: 4px; cursor: pointer; margin-top: 10px; }
+
+/* Lista de Enigmas */
+.puzzle-list { max-height: 200px; overflow-y: auto; margin-bottom: 15px; border: 1px solid #222; background: #050505; }
+.puzzle-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #222; font-size: 0.85rem; }
+.btn-delete { background: rgba(255, 0, 76, 0.1); border: 1px solid var(--error); color: var(--error); width: 30px; height: 30px; border-radius: 4px; cursor: pointer; }
+
+/* --- OVERLAYS & ANIMAÇÕES (FEEDBACK) --- */
+.overlay {
+    position: fixed; inset: 0; background: rgba(0, 10, 5, 0.95); z-index: 200;
+    display: flex; justify-content: center; align-items: center; backdrop-filter: blur(5px);
+    animation: fadeIn 0.3s ease;
+}
+
+.msg-box { text-align: center; color: var(--primary); transform: scale(0.8); animation: popIn 0.4s forwards; }
+.msg-box i { font-size: 4rem; margin-bottom: 10px; filter: drop-shadow(0 0 15px var(--primary)); }
+.msg-box h1 { font-family: var(--font-mono); letter-spacing: 2px; margin-bottom: 10px; font-size: 1.8rem; }
+.msg-box button { margin-top: 20px; padding: 15px 30px; background: transparent; border: 2px solid var(--primary); color: var(--primary); font-weight: bold; cursor: pointer; transition: 0.3s; }
+.msg-box button:hover { background: var(--primary); color: #000; box-shadow: 0 0 20px var(--primary); }
+
+.scan-line {
+    position: absolute; top: 0; left: 0; width: 100%; height: 5px;
+    background: var(--primary); box-shadow: 0 0 15px var(--primary);
+    animation: scan 1.5s linear infinite; opacity: 0.5; pointer-events: none;
+}
+
+.glitch-layer {
+    position: fixed; inset: 0; z-index: 150; background: rgba(255, 0, 50, 0.2);
+    mix-blend-mode: overlay; pointer-events: none;
+    animation: glitch-anim 0.2s steps(2) infinite;
+}
+
+.shake-screen { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+
+@keyframes scan { 0% { top: -10%; } 100% { top: 110%; } }
+@keyframes popIn { to { transform: scale(1); } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes pulse { 50% { opacity: 0.3; } }
+@keyframes shake { 10%, 90% { transform: translate3d(-2px, 0, 0); } 20%, 80% { transform: translate3d(4px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-6px, 0, 0); } 40%, 60% { transform: translate3d(6px, 0, 0); } }
+@keyframes glitch-anim {
+    0% { transform: translate(0,0); }
+    20% { transform: translate(-10px, 5px); background: rgba(255,0,0,0.3); }
+    40% { transform: translate(10px, -5px); }
+    60% { transform: translate(-5px, 10px); background: rgba(0,0,255,0.1); }
+    100% { transform: translate(0,0); }
+}
